@@ -77,3 +77,12 @@ flutter run
 
 ## 5) Git
 Le dépôt doit rester avec une seule branche: `main`.
+
+
+## 6) Notes importantes (Web + IntelliJ)
+- Si vous lancez Flutter sur **Chrome (Web)**, l'API utilisée est `http://localhost:8081/api`.
+- Si vous lancez Flutter sur **émulateur Android**, l'API utilisée est `http://10.0.2.2:8081/api`.
+- Erreur IntelliJ `JDK isn't specified for module 'gestion_formation'`:
+  - Ouvrir **File > Project Structure > Project SDK**
+  - Sélectionner JDK 21 ou 23
+  - Dans **Modules > gestion_formation**, affecter le même SDK.

@@ -88,6 +88,23 @@ Le dépôt doit rester avec une seule branche: `main`.
   - Dans **Modules > gestion_formation**, affecter le même SDK.
 
 
+
+### Correction immédiate de l'erreur IntelliJ
+1. **File > Project Structure > Project**
+2. Project SDK: choisir `JDK 21` (ou `JDK 23`)
+3. Project language level: `21 - LTS`
+4. **File > Project Structure > Modules > gestion_formation > Dependencies**
+5. Module SDK: choisir le même JDK
+6. Appliquer puis reconstruire le projet.
+
+Alternative terminal (sans IntelliJ):
+```bash
+cd backend
+mvn -v
+mvn clean compile
+mvn spring-boot:run
+```
+
 ## 7) Dépannage ERR_CONNECTION_REFUSED
 - L'erreur `POST http://localhost:8081/... ERR_CONNECTION_REFUSED` signifie que le backend Spring Boot n'est pas démarré.
 - Démarrer le backend avant Flutter:

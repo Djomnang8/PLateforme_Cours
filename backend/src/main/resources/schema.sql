@@ -1,0 +1,44 @@
+CREATE DATABASE IF NOT EXISTS gestion_cours CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE gestion_cours;
+
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  full_name VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  matricule VARCHAR(50) NOT NULL UNIQUE,
+  role VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS courses (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  active BIT NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS quizzes (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  passing_score INT NOT NULL,
+  course_id BIGINT NOT NULL,
+  CONSTRAINT fk_quiz_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS progress (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  learner_id BIGINT NOT NULL,
+  course_id BIGINT NOT NULL,
+  completion_percent INT NOT NULL,
+  CONSTRAINT fk_progress_user FOREIGN KEY (learner_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_progress_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS certifications (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  learner_id BIGINT NOT NULL,
+  course_id BIGINT NOT NULL,
+  issued_at DATE NOT NULL,
+  CONSTRAINT fk_cert_user FOREIGN KEY (learner_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_cert_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);

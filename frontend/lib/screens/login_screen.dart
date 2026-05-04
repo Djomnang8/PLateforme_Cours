@@ -4,6 +4,7 @@ import 'forgot_password_screen.dart';
 import 'second_factor_screen.dart';
 import 'dashboard_screen.dart';
 import 'register_screen.dart';
+import '../services/user_session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,21 +16,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final _password = TextEditingController();
 
   Future<void> _submit() async {
-    try {
-      final data = await ApiService.login(_email.text.trim(), _password.text);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Connexion réussie')));
-      if (data['requiresSecondFactor'] == true) {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => SecondFactorScreen(email: data['email'])));
-        return;
-      }
-      Navigator.push(context, MaterialPageRoute(builder: (_) => DashboardScreen(role: data['role'].toString())));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur: $e')));
+  try {
+    final data = await ApiService.login(_email.text.trim(), _password.text);
+    if (!mounted) return;
+    UserSession.setCredentials(_email.text.trim(), _password.text, data['role'].toString());
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Connexion réussie')));
+    if (data['requiresSecondFactor'] == true) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => SecondFactorScreen(email: data['email'], role: data['role'])));
+      return;
     }
+    Navigator.push(context, MaterialPageRoute(builder: (_) => DashboardScreen(role: data['role'].toString())));
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur: $e')));
   }
-
+}
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('Connexion')),

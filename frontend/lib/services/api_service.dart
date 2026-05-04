@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'user_session.dart';
 
 class ApiService {
   static String get baseUrl {
@@ -9,10 +10,18 @@ class ApiService {
     return 'http://10.0.2.2:8081/api';
   }
 
-  static Future<dynamic> _requestJson(String method, String endpoint, {Map<String, dynamic>? body}) async {
+  static Future<dynamic> _requestJson(String method, String endpoint,
+      {Map<String, dynamic>? body}) async {
     try {
       final uri = Uri.parse('$baseUrl$endpoint');
-      final headers = {'Content-Type': 'application/json'};
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+      };
+      final auth = UserSession.basicAuthHeader();
+      if (auth.isNotEmpty) {
+        headers['Authorization'] = auth;
+      }
+
       late final http.Response res;
       switch (method) {
         case 'GET':
@@ -45,31 +54,71 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> _postJson(String endpoint, Map<String, dynamic> body) async {
-    final data = await _requestJson('POST', endpoint, body: body);
-    return (data as Map<String, dynamic>);
-  }
-
+  // Auth
   static Future<void> registerLearner(String fullName, String email, String password) async {
-    await _postJson('/auth/register', {'fullName': fullName, 'email': email, 'password': password});
+    await _requestJson('POST', '/auth/register', body: {'fullName': fullName, 'email': email, 'password': password});
   }
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
-    return _postJson('/auth/login', {'email': email, 'password': password});
+    final data = await _requestJson('POST', '/auth/login', body: {'email': email, 'password': password});
+    return (data as Map<String, dynamic>);
   }
 
   static Future<void> verifyMatricule(String email, String matricule) async {
-    await _postJson('/auth/verify-matricule', {'email': email, 'matricule': matricule});
+    await _requestJson('POST', '/auth/verify-matricule', body: {'email': email, 'matricule': matricule});
   }
 
-  static Future<void> forgotPassword(String email, String password) async {
-    await _postJson('/auth/forgot-password', {'email': email, 'newPassword': password});
+  static Future<void> forgotPassword(String email, String newPassword) async {
+    await _requestJson('POST', '/auth/forgot-password', body: {'email': email, 'newPassword': newPassword});
   }
 
+  // Courses
   static Future<List<dynamic>> getCourses() async => (await _requestJson('GET', '/courses')) as List<dynamic>;
+  static Future<Map<String, dynamic>> createCourse(Map<String, dynamic> body) async =>
+      (await _requestJson('POST', '/courses', body: body)) as Map<String, dynamic>;
+  static Future<Map<String, dynamic>> updateCourse(int id, Map<String, dynamic> body) async =>
+      (await _requestJson('PUT', '/courses/$id', body: body)) as Map<String, dynamic>;
+  static Future<void> deleteCourse(int id) async => await _requestJson('DELETE', '/courses/$id');
+
+  // Quizzes
   static Future<List<dynamic>> getQuizzes() async => (await _requestJson('GET', '/quizzes')) as List<dynamic>;
+  // Quizzes
+static Future<Map<String, dynamic>> createQuiz(Map<String, dynamic> body) async =>
+    (await _requestJson('POST', '/quizzes', body: body)) as Map<String, dynamic>;
+// Pour l'update, on envoie le même body
+static Future<Map<String, dynamic>> updateQuiz(int id, Map<String, dynamic> body) async =>
+    (await _requestJson('PUT', '/quizzes/$id', body: body)) as Map<String, dynamic>;
+  static Future<void> deleteQuiz(int id) async => await _requestJson('DELETE', '/quizzes/$id');
+
+  // Progress
   static Future<List<dynamic>> getProgress() async => (await _requestJson('GET', '/progress')) as List<dynamic>;
+  static Future<Map<String, dynamic>> createProgress(Map<String, dynamic> body) async =>
+      (await _requestJson('POST', '/progress', body: body)) as Map<String, dynamic>;
+  static Future<Map<String, dynamic>> updateProgress(int id, Map<String, dynamic> body) async =>
+      (await _requestJson('PUT', '/progress/$id', body: body)) as Map<String, dynamic>;
+  static Future<void> deleteProgress(int id) async => await _requestJson('DELETE', '/progress/$id');
+  static Future<List<dynamic>> getMyProgress() async => (await _requestJson('GET', '/progress/my')) as List<dynamic>;
+  static Future<void> updateMyProgress(int courseId, int percent) async {
+    await _requestJson('PUT', '/progress/my/$courseId', body: {'completionPercent': percent});
+  }
+
+  // Certifications
   static Future<List<dynamic>> getCertifications() async => (await _requestJson('GET', '/certifications')) as List<dynamic>;
-  static Future<Map<String, dynamic>> getAnalytics() async => (await _requestJson('GET', '/analytics')) as Map<String, dynamic>;
+  static Future<Map<String, dynamic>> createCertification(Map<String, dynamic> body) async =>
+      (await _requestJson('POST', '/certifications', body: body)) as Map<String, dynamic>;
+  static Future<Map<String, dynamic>> updateCertification(int id, Map<String, dynamic> body) async =>
+      (await _requestJson('PUT', '/certifications/$id', body: body)) as Map<String, dynamic>;
+  static Future<void> deleteCertification(int id) async => await _requestJson('DELETE', '/certifications/$id');
+  static Future<List<dynamic>> getMyCertifications() async => (await _requestJson('GET', '/certifications/my')) as List<dynamic>;
+
+  // Employees
   static Future<List<dynamic>> getEmployees() async => (await _requestJson('GET', '/employees')) as List<dynamic>;
+  static Future<Map<String, dynamic>> createEmployee(Map<String, dynamic> body) async =>
+      (await _requestJson('POST', '/employees', body: body)) as Map<String, dynamic>;
+  static Future<Map<String, dynamic>> updateEmployee(int id, Map<String, dynamic> body) async =>
+      (await _requestJson('PUT', '/employees/$id', body: body)) as Map<String, dynamic>;
+  static Future<void> deleteEmployee(int id) async => await _requestJson('DELETE', '/employees/$id');
+
+  // Analytics
+  static Future<Map<String, dynamic>> getAnalytics() async => (await _requestJson('GET', '/analytics')) as Map<String, dynamic>;
 }

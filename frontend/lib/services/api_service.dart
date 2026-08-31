@@ -121,4 +121,41 @@ static Future<Map<String, dynamic>> updateQuiz(int id, Map<String, dynamic> body
 
   // Analytics
   static Future<Map<String, dynamic>> getAnalytics() async => (await _requestJson('GET', '/analytics')) as Map<String, dynamic>;
+
+  // Documents
+static Future<List<dynamic>> getDocuments(int courseId) async =>
+    (await _requestJson('GET', '/courses/$courseId/documents')) as List<dynamic>;
+
+static Future<Map<String, dynamic>> uploadDocument(int courseId, Uint8List bytes, String fileName) async {
+    final uri = Uri.parse('$baseUrl/courses/$courseId/documents');
+    final request = http.MultipartRequest('POST', uri);
+    final auth = UserSession.basicAuthHeader();
+    if (auth.isNotEmpty) request.headers['Authorization'] = auth;
+    request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fileName));
+    final streamed = await request.send().timeout(const Duration(seconds: 30));
+    final res = await http.Response.fromStream(streamed);
+    if (res.statusCode >= 400) throw Exception('Erreur upload');
+    return jsonDecode(res.body);
+}
+
+// Questions d'un quiz
+static Future<List<dynamic>> getQuestions(int quizId) async =>
+    (await _requestJson('GET', '/quizzes/$quizId/questions')) as List<dynamic>;
+
+static Future<Map<String, dynamic>> createQuestion(int quizId, Map<String, dynamic> body) async =>
+    (await _requestJson('POST', '/quizzes/$quizId/questions', body: body)) as Map<String, dynamic>;
+
+static Future<void> updateQuestion(int quizId, int questionId, Map<String, dynamic> body) async =>
+    await _requestJson('PUT', '/quizzes/$quizId/questions/$questionId', body: body);
+
+static Future<void> deleteQuestion(int quizId, int questionId) async =>
+    await _requestJson('DELETE', '/quizzes/$quizId/questions/$questionId');
+
+// Progression automatique
+static Future<void> updateScrollProgress(int courseId, int percent) async =>
+    await _requestJson('PUT', '/progress/my/$courseId/scroll', body: {'percent': percent});
+
+static Future<Map<String, dynamic>> submitQuiz(int courseId, List<int> answers) async =>
+    (await _requestJson('POST', '/progress/my/$courseId/submit-quiz', body: answers)) as Map<String, dynamic>;
+
 }

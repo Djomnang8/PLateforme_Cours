@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.1
+  syncfusion_flutter_pdfviewer: ^24.1.41   # vérifiez la dernière version
 
 flutter:
   uses-material-design: true

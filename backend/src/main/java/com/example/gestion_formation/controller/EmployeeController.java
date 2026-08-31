@@ -6,7 +6,6 @@ import com.example.gestion_formation.repository.AppUserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 public class EmployeeController {
     private final AppUserRepository repository;
-    private final PasswordEncoder encoder;
+    //private final PasswordEncoder encoder;
 
     @GetMapping public List<AppUser> all(){ return repository.findAll().stream().filter(u -> u.getRole()!=Role.ROLE_LEARNER).toList(); }
     @PostMapping public AppUser create(@RequestBody AppUser u){ u.setId(null); u.setPassword(u.getPassword()); return repository.save(u);} 

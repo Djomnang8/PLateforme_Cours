@@ -14,8 +14,16 @@ import org.springframework.web.bind.annotation.*;
 public class CourseController {
     private final CourseRepository repository;
 
-    @GetMapping public List<Course> all() { return repository.findAll(); }
+   @GetMapping
+public List<Course> all(@RequestParam(required = false) String search) {
+    if (search != null && !search.isEmpty()) {
+        return repository.findByTitleContainingIgnoreCase(search);
+    }
+    return repository.findAll();
+}
     @PostMapping @PreAuthorize("hasAnyRole('EMPLOYEE','ADMIN')") public Course create(@RequestBody Course c) { return repository.save(c); }
     @PutMapping("/{id}") @PreAuthorize("hasAnyRole('EMPLOYEE','ADMIN')") public Course update(@PathVariable Long id, @RequestBody Course c){ c.setId(id); return repository.save(c);} 
     @DeleteMapping("/{id}") @PreAuthorize("hasAnyRole('EMPLOYEE','ADMIN')") public void delete(@PathVariable Long id){ repository.deleteById(id);} 
+    
+
 }

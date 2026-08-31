@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.*;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -48,10 +48,22 @@ public class SecurityConfig {
         };
     }
 
+    /**
+     * Les mots de passe etaient stockes et compares en clair.
+     *
+     * L'infrastructure existait pourtant : un bean PasswordEncoder etait
+     * declare et injecte, mais il renvoyait NoOpPasswordEncoder — l'encodeur
+     * que Spring fournit explicitement pour ne rien encoder, et qu'il marque
+     * deprecie pour cette raison. Le mot de passe de chaque utilisateur etait
+     * donc lisible par quiconque ouvrait la table.
+     *
+     * BCrypt est adaptatif : le cout de calcul augmente avec le materiel, ce
+     * qui garde une empreinte couteuse a attaquer par force brute des annees
+     * apres son ecriture.
+     */
     @Bean
-    @SuppressWarnings("deprecation")
     PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
     // Configuration CORS globale

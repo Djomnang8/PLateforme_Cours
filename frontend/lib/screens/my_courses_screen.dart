@@ -103,9 +103,13 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                   title: Text(course['title'] ?? 'Sans titre'),
                   subtitle: Text('Progression: $percent%'),
                   trailing: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => _showPercentDialog(course['id'], percent),
-                  ),
+  icon: const Icon(Icons.arrow_forward),
+  onPressed: () {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => CourseDetailScreen(course: course),
+    ));
+  },
+),
                 ),
               );
             },

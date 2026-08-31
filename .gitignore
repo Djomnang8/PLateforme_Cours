@@ -1,0 +1,15 @@
+# Produits de compilation.
+target/
+build/
+*.jar
+*.class
+
+# Flutter / Dart.
+.dart_tool/
+.flutter-plugins*
+frontend/build/
+
+# Configuration locale d'IDE.
+.idea/
+*.iml
+.vscode/

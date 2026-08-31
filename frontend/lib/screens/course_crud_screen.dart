@@ -46,6 +46,19 @@ class _CourseCRUDScreenState extends State<CourseCRUDScreen> {
         },
         child: const Icon(Icons.add),
       ),
+
+      // dans le build, avant la FutureBuilder
+TextField(
+  decoration: const InputDecoration(labelText: 'Rechercher cours...'),
+  onChanged: (val) {
+    setState(() {
+      _searchQuery = val;
+    });
+  },
+),
+// puis passer la requête filtrée :
+_future = ApiService.getCourses(search: _searchQuery.isEmpty ? null : _searchQuery);
+
       body: FutureBuilder<List<dynamic>>(
         future: _future,
         builder: (context, snapshot) {

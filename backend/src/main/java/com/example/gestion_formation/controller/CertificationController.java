@@ -6,7 +6,6 @@ import com.example.gestion_formation.repository.AppUserRepository;
 import com.example.gestion_formation.repository.CertificationRepository;
 import com.example.gestion_formation.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
